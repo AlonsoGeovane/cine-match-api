@@ -1,0 +1,27 @@
+{
+  "name": "cine-match-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/AlonsoGeovane/cine-match-api.git",
+  "author": "AlonsoGeovane <geovane.halonso.2005@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.3"
+  }
+}
