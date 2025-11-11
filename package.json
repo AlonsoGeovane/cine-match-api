@@ -8,7 +8,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "import": "node scripts/importMovies.js",
+    "check": "node scripts/checkMovies.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
