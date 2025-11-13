@@ -41,5 +41,5 @@ export const Movie = database.define('Movie', {
     }
 }, {
     tableName: 'moviedb',
-    timestamps: false
+    timestamps: true
 });

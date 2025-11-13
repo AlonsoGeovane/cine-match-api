@@ -18,5 +18,5 @@ export const Questions = database.define('Questions',{
     }
 }, {
     tableName: 'questions',
-    timestamps: false
+    timestamps: true
 });
