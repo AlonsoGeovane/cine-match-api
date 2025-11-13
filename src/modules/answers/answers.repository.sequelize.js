@@ -40,10 +40,10 @@ export const makeAnswersRepoSequelize = () => {
         return answers.map(a => a.toJSON());
     }
     const findById = async (id) => {
-        const answer = await Answer.findByPk(id, {
+        const answer = await Answers.findByPk(id, {
             include: [
                 {
-                    model: Question,
+                    model: Questions,
                     as: 'question',
                     attributes: ['id', 'text', 'options']
                 }
@@ -53,15 +53,15 @@ export const makeAnswersRepoSequelize = () => {
         return answer ? answer.toJSON() : null;
     }
     const deleteBySession = async (sessionId) => {
-        return await Answer.destroy({ where: { sessionId } });
+        return await Answers.destroy({ where: { sessionId } });
     }
 
     const countBySession = async (sessionId) => {
-        return await Answer.count({ where: { sessionId } });
+        return await Answers.count({ where: { sessionId } });
     }
 
     const isSessionComplete = async (sessionId) => {
-        const totalQuestions = await Question.count();
+        const totalQuestions = await Questions.count();
         const answeredQuestions = await countBySession(sessionId);
 
         return {
