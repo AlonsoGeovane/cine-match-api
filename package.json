@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "import": "node scripts/importMovies.js",
+    "import:movies": "node scripts/importMovies.js",
+    "import:questions": "node scripts/importQuestions.js",
     "check": "node scripts/checkMovies.js"
   },
   "dependencies": {

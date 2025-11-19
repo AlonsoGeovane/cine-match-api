@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { database } from '../src/config/database.js';
 import { Movie } from '../src/models/Movie.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -231,7 +232,7 @@ function parseMovieRow(row) {
 
   try {
     return {
-      id: parseInt(values[0]) || null,
+      id: uuidv4(),
       releaseDate: values[1] || null,
       title: values[2] || '',
       overview: values[3] || '',

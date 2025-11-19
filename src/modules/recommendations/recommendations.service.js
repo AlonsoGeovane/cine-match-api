@@ -1,9 +1,9 @@
 import { HttpError } from "../../utils/httpError.js"
-import { makeAnswerRepoSequelize } from "../answers/answers.repository.sequelize.js"
+import { makeAnswersRepoSequelize } from "../answers/answers.repository.sequelize.js"
 import { makeRecommendationRepoSequelize } from "./recommendations.repository.js"
 
 export const recommendationService = () => {
-    const answersRepo = makeAnswerRepoSequelize()
+    const answersRepo = makeAnswersRepoSequelize()
     const recommendationRepo = makeRecommendationRepoSequelize()
 
     const generateRecommendations = async (sessionId) => {

@@ -1,12 +1,13 @@
 import { DataTypes } from 'sequelize';
 import { database } from '../config/database.js';
-import { text } from 'express';
 
 export const Answers = database.define('Answers', {
-    id: {
-        type: DataTypes.INTEGER,
+     id: {
+        type: DataTypes.UUID, // Mude para UUID
+        defaultValue: DataTypes.UUIDV4, // Adicione o gerador de UUID v4
         primaryKey: true,
-        autoIncrement: true
+        allowNull: false, // Garante que não será nulo
+        unique: true // Garante a unicidade (primaryKey já implica isso, mas é bom ser explícito)
     },
     sessionId: {
         type: DataTypes.UUID,
@@ -18,7 +19,7 @@ export const Answers = database.define('Answers', {
         allowNull: false,
     },
     question_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         field: 'question_id',
         references: {
             model: 'questions',

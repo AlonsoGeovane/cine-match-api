@@ -6,6 +6,8 @@ import { env } from './config/env.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authRouter } from './routes/auth.routes.js';
 import { questionRouter } from './routes/question.routes.js';
+import { recommendationRouter } from './routes/recommendations.routes.js';
+import { answerRouter } from './routes/answer.routes.js';
 
 export const createApp = () => {
     const app = express();
@@ -21,6 +23,8 @@ export const createApp = () => {
 
     app.use("/auth", authRouter())
     app.use("/questions", questionRouter())
+    app.use("/answers", answerRouter())
+    app.use("/recommedations", recommendationRouter())
 
     app.use(errorHandler)
 

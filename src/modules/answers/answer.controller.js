@@ -1,4 +1,3 @@
-import { response } from "express"
 import { makeAnswersService } from "./answer.service.js"
 
 export const makeAnswerController = () => {

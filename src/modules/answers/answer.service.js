@@ -2,7 +2,7 @@ import { HttpError } from "../../utils/httpError.js";
 import { makeQuestionRepoSequelize } from "../questions/question.repository.js";
 import { makeAnswersRepoSequelize } from "./answers.repository.sequelize.js";
 
-export const makeAnswersRepoSequelize = () => {
+export const makeAnswersService = () => {
     const answerRepo = makeAnswersRepoSequelize();
     const questionRepo = makeQuestionRepoSequelize();
 
