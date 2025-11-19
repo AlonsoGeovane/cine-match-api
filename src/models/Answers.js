@@ -18,7 +18,7 @@ export const Answers = database.define('Answers', {
         type: DataTypes.JSON,
         allowNull: false,
     },
-    question_id: {
+    questionId: {
         type: DataTypes.UUID,
         field: 'question_id',
         references: {

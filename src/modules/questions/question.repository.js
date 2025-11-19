@@ -1,4 +1,4 @@
-import { Questions } from "../../models/questions.js";
+import { Questions } from "../../models/Questions.js";
 
 export const makeQuestionRepoSequelize = () => {
     const findAll = async () => {
@@ -8,7 +8,7 @@ export const makeQuestionRepoSequelize = () => {
     }
 
     const findById = async (id) => {
-        const question = await Questions.findById(id);
+        const question = await Questions.findByPk(id);
         return question ? question.toJSON() : null;
     }
 

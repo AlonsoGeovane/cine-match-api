@@ -21,6 +21,7 @@ export const makeAnswersService = () => {
             throw new HttpError(`Invalid answer options: ${invalidOptions.join(',')} `, 400);
         }
 
+
         return await answerRepo.upsert({ sessionId, questionId, answer });
     }
 

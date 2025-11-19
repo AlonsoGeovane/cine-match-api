@@ -39,32 +39,38 @@ export const recommendationService = () => {
 
         // Mapear "genres"
         const genresAnswer = answers['Quais gêneros você mais gosta?'];
-        if (genresAnswer > genresAnswer.length > 0) {
+        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
+        if (Array.isArray(genresAnswer) && genresAnswer.length > 0) {
             filters.preferredGenres = genresAnswer;
         }
 
         // Mapear "avoid_genres"
         const avoidGenresAnswer = answers['Tem algum gênero que você NÃO gosta?'];
-        if (avoidGenresAnswer > avoidGenresAnswer.length > 0) {
+        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
+        if (Array.isArray(avoidGenresAnswer) && avoidGenresAnswer.length > 0) {
             filters.avoidGenres = avoidGenresAnswer;
         }
 
         // Mapear "languages"
         const languagesAnswer = answers['Em quais idiomas você prefere assistir filmes?'];
-        if (languagesAnswer > languagesAnswer.length > 0) {
+        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
+        if (Array.isArray(languagesAnswer) && languagesAnswer.length > 0) {
             // As opções de idioma vêm como "en (Inglês)", então extraímos apenas o código
             filters.language = languagesAnswer[0].split(' ')[0]; // Pega o primeiro idioma selecionado
         }
 
         // Mapear "min_rating"
         const minRatingAnswer = answers['Qual a nota mínima aceitável para você?'];
-        if (minRatingAnswer > minRatingAnswer.length > 0) {
+        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
+        if (Array.isArray(minRatingAnswer) && minRatingAnswer.length > 0) {
+            // Garante que o valor seja um número, mesmo que venha como string no array
             filters.minRating = parseFloat(minRatingAnswer[0]);
         }
 
         // Mapear "mood" (exemplo simplificado)
         const moodAnswer = answers['Como você está se sentindo hoje?'];
-        if (moodAnswer > moodAnswer.length > 0) {
+        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
+        if (Array.isArray(moodAnswer) && moodAnswer.length > 0) {
             const selectedMood = moodAnswer[0];
             // Exemplo de mapeamento de humor para gênero principal
             if (selectedMood.includes('Animado')) filters.preferredGenres = [...(filters.preferredGenres || []), 'Action', 'Adventure'];
@@ -79,6 +85,9 @@ export const recommendationService = () => {
                 filters.preferredGenres = [...new Set(filters.preferredGenres)];
             }
         }
+
+        // **REMOVIDO:** Linha de console.log de debugging
+        // console.log({genresAnswer}) 
 
         return filters;
     }

@@ -29,7 +29,7 @@ export const makeRecommendationRepoSequelize = () => {
 
         // Filtro por idioma
         if (filters.language) {
-            where.language = filters.language;
+            where.originalLanguage = filters.language;
         }
 
         // Filtro por nota mínima
@@ -46,7 +46,7 @@ export const makeRecommendationRepoSequelize = () => {
                 ['voteAverage', 'DESC'],
                 ['releaseDate', 'DESC']
             ],
-            limit: 100 // Limitar a 100 recomendações
+            limit: 10 // Limitar a 100 recomendações
         });
 
         return movies.map(movie => movie.toJSON());

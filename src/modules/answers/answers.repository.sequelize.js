@@ -1,30 +1,22 @@
 import { Answers } from "../../models/answers.js";
-import { Questions } from "../../models/questions.js";
+import { Questions } from "../../models/Questions.js";
 
 export const makeAnswersRepoSequelize = () => {
     const upsert = async ({ sessionId, questionId, answer }) => {
-        const [answerRecord, created] = await Answers.upsert(
-            {
-                sessionId,
-                questionId,
-                answer
-            },
-            {
-                returning: true
-            }
-        );
+         // Use create para sempre gerar um novo registro
+        const newAnswer = await Answers.create({ sessionId, questionId, answer })
 
-        const result = await Answers.findByPk(answerRecord.id, {
+        // Buscar o registro REAL após a criação para incluir a questão
+        const answerRecord = await Answers.findByPk(newAnswer.id, {
             include: [
                 {
                     model: Questions,
                     as: 'question',
-                    attributes: ['text']
+                    attributes: ['id', 'text'] // Use 'question' se esse for o nome da coluna no model Questions
                 }
             ]
-        });
-
-        return result.toJSON();
+        })
+        return answerRecord ? answerRecord.toJSON() : null
     }
     const findBySession = async (sessionId) => {
         const answers = await Answers.findAll({
