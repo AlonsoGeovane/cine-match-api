@@ -6,37 +6,218 @@ const questionsData = [
     {
         text: 'Como você está se sentindo hoje?',
         options: [
-            'Animado (Action, Adventure)',
-            'Pensativo (Drama, Mystery)',
-            'Empolgado (Science Fiction, Thriller)',
-            'Romântico (Romance, Comedy)',
-            'Assustado (Horror)',
-            'Curioso (Documentary, History)'
+            {
+                label: 'Animado (Action, Adventure)',
+                value: 'Animado (Action, Adventure)',
+                emoji: "⚡"
+            },
+            {
+                label: 'Pensativo (Drama, Mystery)',
+                value: 'Pensativo (Drama, Mystery)',
+                emoji: "🤔"
+            },
+            {
+                label: 'Empolgado (Science Fiction, Thriller)',
+                value: 'Empolgado (Science Fiction, Thriller)',
+                emoji: "🤩"
+            },
+            {
+                label: 'Romântico (Romance, Comedy)',
+                value: 'Romântico (Romance, Comedy)',
+                emoji: "🥰"
+            },
+            {
+                label: 'Assustado (Horror)',
+                value: 'Assustado (Horror)',
+                emoji: "😱"
+            },
+            {
+                label: 'Curioso (Documentary, History)',
+                value: 'Curioso (Documentary, History)',
+                emoji: "🤓"
+            },
+
         ]
     },
     {
         text: 'Quais gêneros você mais gosta?',
         options: [
-            'Action', 'Adventure', 'Comedy', 'Drama', 'Horror', 'Romance',
-            'Science Fiction', 'Thriller', 'Fantasy', 'Mystery', 'Animation', 'Crime'
+            {
+                label: 'Ação',
+                value: 'Action',
+                emoji: "💥"
+            },
+            {
+                label: 'Aventura',
+                value: 'Adventure',
+                emoji: "🏹"
+            },
+            {
+                label: 'Comédia',
+                value: 'Comedy',
+                emoji: "🤣"
+            },
+            {
+                label: 'Drama',
+                value: 'Drama',
+                emoji: "🎭"
+            },
+            {
+                label: 'Terror',
+                value: 'Horror',
+                emoji: "🩻"
+            },
+            {
+                label: 'Romance',
+                value: 'Romance',
+                emoji: "💘"
+            },
+            {
+                label: 'Ficção Científica',
+                value: 'Science Fiction',
+                emoji: "👽"
+            },
+            {
+                label: 'Suspense',
+                value: 'Thriller',
+                emoji: "⏳"
+            },
+            {
+                label: 'Fantasia',
+                value: 'Fantasy',
+                emoji: "🧙‍♂️"
+            },
+            {
+                label: 'Mistério',
+                value: 'Mystery',
+                emoji: "🔍"
+            },
+            {
+                label: 'Animação',
+                value: 'Animation',
+                emoji: "🧸"
+            },
+            {
+                label: 'Crime',
+                value: 'Crime',
+                emoji: "👮"
+            },
         ]
     },
     {
         text: 'Em quais idiomas você prefere assistir filmes?',
         options: [
-            'en (Inglês)', 'pt (Português)', 'es (Espanhol)', 'fr (Francês)',
-            'ja (Japonês)', 'ko (Coreano)', 'de (Alemão)', 'it (Italiano)'
+            {
+                label: 'en (Inglês)',
+                value: 'en (Inglês)',
+                emoji: "🇪🇳"
+            },
+            {
+                label: 'pt (Português)',
+                value: 'pt (Português)',
+                emoji: "🇵🇹"
+            },
+            {
+                label: 'es (Espanhol)',
+                value: 'es (Espanhol)',
+                emoji: "🇪🇸"
+            },
+            {
+                label: 'fr (Francês)',
+                value: 'fr (Francês)',
+                emoji: "🇫🇷"
+            },
+            {
+                label: 'ja (Japonês)',
+                value: 'ja (Japonês)',
+                emoji: "🇯🇦"
+            },
+            {
+                label: 'ko (Coreano)',
+                value: 'ko (Coreano)',
+                emoji: "🇰🇴"
+            },
+            {
+                label: 'de (Alemão)',
+                value: 'de (Alemão)',
+                emoji: "🇩🇪"
+            },
+            {
+                label: 'it (Italiano)',
+                value: 'it (Italiano)',
+                emoji: "🇮🇹"
+            },
         ]
     },
     {
         text: 'Tem algum gênero que você NÃO gosta?',
         options: [
-            'Horror', 'Romance', 'War', 'Western', 'Musical', 'Documentary', 'Animation'
+            {
+                label: 'Terror',
+                value: 'Horror',
+                emoji: "🩻"
+            },
+            {
+                label: 'Romance',
+                value: 'Romance',
+                emoji: "💘"
+            },
+            {
+                label: 'Guerra',
+                value: 'War',
+                emoji: "🪖"
+            },
+            {
+                label: 'Ocidental',
+                value: 'Western',
+                emoji: "🎴"
+            },
+            {
+                label: 'Musical',
+                value: 'Musical',
+                emoji: "🎵"
+            },
+            {
+                label: 'Documentário',
+                value: 'Documentary',
+                emoji: "🗃️"
+            },
+            {
+                label: 'Animação',
+                value: 'Animation',
+                emoji: "🧸"
+            },
         ]
     },
     {
         text: 'Qual a nota mínima aceitável para você?',
-        options: ['5.0', '6.0', '7.0', '8.0', '9.0']
+        options: [
+            {
+                label: '5.0',
+                value: '5.0',
+                emoji: "5️⃣"
+            },
+            {
+                label: '6.0',
+                value: '6.0',
+                emoji: "6️⃣"
+            },
+            {
+                label: '7.0',
+                value: '7.0',
+                emoji: "7️⃣"
+            },
+            {
+                label: '8.0',
+                value: '8.0',
+                emoji: "8️⃣"
+            },
+            {
+                label: '9.0',
+                value: '9.0',
+                emoji: "9️⃣"
+            },
+        ]
     }
 ];
 
