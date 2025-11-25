@@ -24,7 +24,7 @@ export const createApp = () => {
     app.use("/auth", authRouter())
     app.use("/questions", questionRouter())
     app.use("/answers", answerRouter())
-    app.use("/recommedations", recommendationRouter())
+    app.use("/recommendations", recommendationRouter())
 
     app.use(errorHandler)
 

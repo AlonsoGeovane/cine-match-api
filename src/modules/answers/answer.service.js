@@ -7,7 +7,7 @@ export const makeAnswersService = () => {
     const questionRepo = makeQuestionRepoSequelize();
 
     const createOrUpdate = async ({ sessionId, questionId, answer }) => {
-        if (!Array.isArray(answer) || answer.lenght === 0) {
+        if (!Array.isArray(answer) || answer.length === 0) {
             throw new HttpError('The answer must be a non-empty array', 400);
         }
 
@@ -16,11 +16,13 @@ export const makeAnswersService = () => {
             throw new HttpError('Question not found', 400);
         }
 
-        const invalidOptions = answer.filter(opt => !question.options.includes(opt));
+        const validOptions = question.options.map(option => option.value);
+
+        const invalidOptions = answer.filter(opt => !validOptions.includes(opt));
+
         if (invalidOptions.length > 0) {
             throw new HttpError(`Invalid answer options: ${invalidOptions.join(',')} `, 400);
         }
-
 
         return await answerRepo.upsert({ sessionId, questionId, answer });
     }

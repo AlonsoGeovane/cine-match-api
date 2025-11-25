@@ -2,12 +2,21 @@ import { HttpError } from "../../utils/httpError.js"
 import { makeAnswersRepoSequelize } from "../answers/answers.repository.sequelize.js"
 import { makeRecommendationRepoSequelize } from "./recommendations.repository.js"
 
+// 🔑 DEFINIÇÃO ESTÁVEL DOS IDs DAS PERGUNTAS (Baseado nos dados brutos fornecidos)
+// **NOTA:** Em um ambiente de produção real, estes IDs devem ser injetados ou buscados.
+const QUESTION_IDS = {
+    MOOD: '722797d2-5718-407e-8759-db27c43e2243',
+    PREFERRED_GENRES: 'a340baf0-78ae-4449-9d9b-c10a1827f715',
+    AVOID_GENRES: 'feb9b9eb-5d76-41eb-aac1-8b685aa74207',
+    LANGUAGE: 'bfd58c0e-95ee-40b3-99b4-88e20b7cc3f6',
+    MIN_RATING: '84e9a07f-f0b3-4474-aef1-5b0614ad0191',
+}
+
 export const recommendationService = () => {
     const answersRepo = makeAnswersRepoSequelize()
     const recommendationRepo = makeRecommendationRepoSequelize()
 
     const generateRecommendations = async (sessionId) => {
-        // 1. Verificar se todas as perguntas foram respondidas
         const progress = await answersRepo.isSessionComplete(sessionId);
         if (!progress.isComplete) {
             throw new HttpError(
@@ -16,78 +25,94 @@ export const recommendationService = () => {
             );
         }
 
-        // 2. Obter todas as respostas da sessão
         const rawAnswers = await answersRepo.findBySession(sessionId);
-        const groupedAnswers = {};
+        const groupedAnswersById = {};
+
+        // 💡 CORREÇÃO: Agrupamento pelo questionId para desacoplar do texto.
         for (const ans of rawAnswers) {
-            groupedAnswers[ans.question.text] = ans.answer; // Agrupa por texto da pergunta
+            const id = ans.questionId;
+            if (id) {
+                groupedAnswersById[id] = ans.answer;
+            }
         }
 
-        // 3. Mapear respostas para filtros de filme
-        const filters = _mapAnswersToFilters(groupedAnswers);
+        // Mapear respostas para filtros de filme
+        const filters = _mapAnswersToFilters(groupedAnswersById);
 
-        // 4. Buscar filmes com base nos filtros
         const recommendations = await recommendationRepo.findMoviesByFilters(filters);
+
         return {
             recommendations,
-            answers: groupedAnswers
+            answers: groupedAnswersById
         };
     }
 
-    const _mapAnswersToFilters = (answers) => {
-        const filters = {};
+    // ----------------------------------------------------------------------
+    // Lógica de Mapeamento (Auxiliar)
+    // ----------------------------------------------------------------------
 
-        // Mapear "genres"
-        const genresAnswer = answers['Quais gêneros você mais gosta?'];
-        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
+    const _mapAnswersToFilters = (answers) => {
+        const filters = {
+            preferredGenres: [],
+            moodBoostGenres: [],
+            avoidGenres: [],
+        };
+
+        const moodAnswer = answers[QUESTION_IDS.MOOD];
+        const genresAnswer = answers[QUESTION_IDS.PREFERRED_GENRES];
+        const avoidGenresAnswer = answers[QUESTION_IDS.AVOID_GENRES];
+        const languagesAnswer = answers[QUESTION_IDS.LANGUAGE];
+        const minRatingAnswer = answers[QUESTION_IDS.MIN_RATING];
+
+        // 1. Mapear Gêneros Preferidos (Filtro PRINCIPAL)
         if (Array.isArray(genresAnswer) && genresAnswer.length > 0) {
+            // O valor da opção é o nome do gênero (ex: 'Thriller')
             filters.preferredGenres = genresAnswer;
         }
 
-        // Mapear "avoid_genres"
-        const avoidGenresAnswer = answers['Tem algum gênero que você NÃO gosta?'];
-        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
+        // 2. Mapear Gêneros Evitados (Filtro EXCLUDENTE)
         if (Array.isArray(avoidGenresAnswer) && avoidGenresAnswer.length > 0) {
             filters.avoidGenres = avoidGenresAnswer;
         }
 
-        // Mapear "languages"
-        const languagesAnswer = answers['Em quais idiomas você prefere assistir filmes?'];
-        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
-        if (Array.isArray(languagesAnswer) && languagesAnswer.length > 0) {
-            // As opções de idioma vêm como "en (Inglês)", então extraímos apenas o código
-            filters.language = languagesAnswer[0].split(' ')[0]; // Pega o primeiro idioma selecionado
-        }
-
-        // Mapear "min_rating"
-        const minRatingAnswer = answers['Qual a nota mínima aceitável para você?'];
-        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
-        if (Array.isArray(minRatingAnswer) && minRatingAnswer.length > 0) {
-            // Garante que o valor seja um número, mesmo que venha como string no array
-            filters.minRating = parseFloat(minRatingAnswer[0]);
-        }
-
-        // Mapear "mood" (exemplo simplificado)
-        const moodAnswer = answers['Como você está se sentindo hoje?'];
-        // **CORREÇÃO AQUI:** Verifica se é um array e tem itens
+        // 3. Mapear Humor (Gêneros de REFORÇO Opcional)
         if (Array.isArray(moodAnswer) && moodAnswer.length > 0) {
             const selectedMood = moodAnswer[0];
-            // Exemplo de mapeamento de humor para gênero principal
-            if (selectedMood.includes('Animado')) filters.preferredGenres = [...(filters.preferredGenres || []), 'Action', 'Adventure'];
-            if (selectedMood.includes('Pensativo')) filters.preferredGenres = [...(filters.preferredGenres || []), 'Drama', 'Mystery'];
-            if (selectedMood.includes('Empolgado')) filters.preferredGenres = [...(filters.preferredGenres || []), 'Science Fiction', 'Thriller'];
-            if (selectedMood.includes('Romântico')) filters.preferredGenres = [...(filters.preferredGenres || []), 'Romance', 'Comedy'];
-            if (selectedMood.includes('Assustado')) filters.preferredGenres = [...(filters.preferredGenres || []), 'Horror'];
-            if (selectedMood.includes('Curioso')) filters.preferredGenres = [...(filters.preferredGenres || []), 'Documentary', 'History'];
+            const boost = [];
 
-            // Remove duplicatas dos gêneros preferidos
-            if (filters.preferredGenres) {
-                filters.preferredGenres = [...new Set(filters.preferredGenres)];
-            }
+            // Mapeamento de Humor para Gêneros Secundários (Reforço)
+            // Se o usuário selecionou 'Assustado (Horror)', 'Horror' é adicionado.
+            if (selectedMood.includes('Animado')) boost.push('Action', 'Adventure');
+            if (selectedMood.includes('Pensativo')) boost.push('Drama', 'Mystery');
+            if (selectedMood.includes('Empolgado')) boost.push('Science Fiction', 'Thriller');
+            if (selectedMood.includes('Romântico')) boost.push('Romance', 'Comedy');
+            if (selectedMood.includes('Assustado')) boost.push('Horror');
+            if (selectedMood.includes('Curioso')) boost.push('Documentary', 'History');
+
+            // 💡 MELHORIA: Evita adicionar gêneros de boost que já são preferidos.
+            filters.moodBoostGenres = boost.filter(
+                genre => !filters.preferredGenres.includes(genre)
+            );
         }
 
-        // **REMOVIDO:** Linha de console.log de debugging
-        // console.log({genresAnswer}) 
+        // 4. Mapear Idioma (MELHORIA: Extração de Código e Multi-seleção)
+        if (Array.isArray(languagesAnswer) && languagesAnswer.length > 0) {
+            filters.languages = languagesAnswer.map(fullLang => {
+                // Regex para extrair o código de duas letras no início: 'pt (Português)' -> 'pt'
+                const match = fullLang.match(/^(\w+)/);
+                return match ? match[1] : null;
+            }).filter(code => code !== null);
+        } else {
+            // Caso o idioma não seja respondido, pode-se definir um fallback como 'en' ou deixar vazio
+            filters.languages = [];
+        }
+
+
+        // 5. Mapear Nota Mínima
+        if (Array.isArray(minRatingAnswer) && minRatingAnswer.length > 0) {
+            // Garante que o valor '5.0' seja convertido corretamente para 5
+            filters.minRating = parseFloat(minRatingAnswer[0]);
+        }
 
         return filters;
     }
