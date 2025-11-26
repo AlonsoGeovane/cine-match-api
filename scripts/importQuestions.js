@@ -109,42 +109,42 @@ const questionsData = [
         options: [
             {
                 label: 'en (Inglês)',
-                value: 'en (Inglês)',
+                value: 'en',
                 emoji: "🇪🇳"
             },
             {
                 label: 'pt (Português)',
-                value: 'pt (Português)',
+                value: 'pt',
                 emoji: "🇵🇹"
             },
             {
                 label: 'es (Espanhol)',
-                value: 'es (Espanhol)',
+                value: 'es',
                 emoji: "🇪🇸"
             },
             {
                 label: 'fr (Francês)',
-                value: 'fr (Francês)',
+                value: 'fr',
                 emoji: "🇫🇷"
             },
             {
                 label: 'ja (Japonês)',
-                value: 'ja (Japonês)',
+                value: 'ja',
                 emoji: "🇯🇦"
             },
             {
                 label: 'ko (Coreano)',
-                value: 'ko (Coreano)',
+                value: 'ko',
                 emoji: "🇰🇴"
             },
             {
                 label: 'de (Alemão)',
-                value: 'de (Alemão)',
+                value: 'de',
                 emoji: "🇩🇪"
             },
             {
                 label: 'it (Italiano)',
-                value: 'it (Italiano)',
+                value: 'it',
                 emoji: "🇮🇹"
             },
         ]

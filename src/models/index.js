@@ -1,16 +1,16 @@
 import { database } from "../config/database.js";
 import { env } from "../config/env.js";
 import { Answers } from "./answers.js";
-import { Questions } from "./questions.js";
+import { Questions } from "./Questions.js";
 import { Movie } from "./Movie.js";
 
 Questions.hasMany(Answers, {
-    foreignKey: 'question_id',
+    foreignKey: 'questions',
     as: 'answers'
 });
 
 Answers.belongsTo(Questions, {
-    foreignKey: 'question_id',
+    foreignKey: 'answers',
     as: 'question'
 });
 
