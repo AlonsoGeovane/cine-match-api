@@ -4,63 +4,70 @@ import { Movie } from "../../models/Movie.js";
 const { literal } = Movie.sequelize;
 
 export const makeRecommendationRepoSequelize = () => {
+
     const findMoviesByFilters = async (filters) => {
         const where = {};
         const order = [];
-
         const conditions = [];
 
-        // Função auxiliar para gerar a condição LIKE
+        // -----------------------------
+        // Funções Auxiliares
+        // -----------------------------
+
         const createLikeCondition = (genre) => ({
-            genre: {
-                // Busca o gênero cercado por vírgulas ou no início/fim da string.
-                // Ex: Busca por 'Ação' deve retornar 'Ação,Drama' e 'Drama,Ação'
+            genre: { 
                 [Op.like]: `%${genre}%`
             }
         });
 
-        // 1. GÊNEROS PREFERIDOS (Filtro Obrigatório)
+        const extractGenres = (movie) => {
+            if (!movie.genre) return [];
+            return movie.genre.split(",").map(g => g.trim());
+        };
+
+        // -----------------------------
+        // 1. Preferred Genres (obrigatório)
+        // -----------------------------
         if (Array.isArray(filters.preferredGenres) && filters.preferredGenres.length > 0) {
-            // Usa Op.or: O filme deve conter PELO MENOS UM dos gêneros preferidos.
             const preferredConditions = filters.preferredGenres.map(createLikeCondition);
             conditions.push({ [Op.or]: preferredConditions });
         }
 
-        // 2. GÊNEROS A EVITAR (Filtro Excludente)
+        // -----------------------------
+        // 2. Avoid genres (remover filmes com esses gêneros)
+        // -----------------------------
         if (Array.isArray(filters.avoidGenres) && filters.avoidGenres.length > 0) {
-            // Usa Op.and de NOT LIKE: O filme NÃO deve conter NENHUM dos gêneros a evitar.
             const avoidConditions = filters.avoidGenres.map(genre => ({
-                genre: {
-                    [Op.notLike]: `%${genre}%`
-                }
+                genre: { [Op.notLike]: `%${genre}%` }
             }));
             conditions.push(...avoidConditions);
         }
 
-        // Aplica todas as condições de gênero combinadas por AND
         if (conditions.length > 0) {
             where[Op.and] = conditions;
         }
 
-        // 3. IDIOMA (Não alterado)
+        // -----------------------------
+        // 3. Languages
+        // -----------------------------
         if (Array.isArray(filters.languages) && filters.languages.length > 0) {
-            where.originalLanguage = {
-                [Op.in]: filters.languages
-            };
+            where.originalLanguage = { [Op.in]: filters.languages };
         }
 
-        // 4. NOTA MÍNIMA (Não alterado)
-        if (typeof filters.minRating === 'number' && filters.minRating >= 0) {
-            where.voteAverage = {
-                [Op.gte]: filters.minRating
-            };
+        // -----------------------------
+        // 4. Min Rating
+        // -----------------------------
+        if (typeof filters.minRating === "number") {
+            where.voteAverage = { [Op.gte]: filters.minRating };
         }
 
-        // 5. ORDENAÇÃO (Não alterado)
-        order.push(['voteAverage', 'DESC']);
-        order.push([literal('RANDOM()')]);
+        // -----------------------------
+        // 5. Order (random + rating)
+        // -----------------------------
+        order.push(["voteAverage", "DESC"]);
+        order.push([literal("RANDOM()")]);
 
-        const LIMIT = 10;
+        const LIMIT = 20; // pegar mais resultados para um cálculo de afinidade melhor
 
         const movies = await Movie.findAll({
             where,
@@ -68,35 +75,63 @@ export const makeRecommendationRepoSequelize = () => {
             limit: LIMIT
         });
 
-        // 6. PÓS-PROCESSAMENTO: Reforço de Humor (Mood Boost)
-        let results = movies.map(movie => movie.toJSON());
+        let results = movies.map(m => m.toJSON());
 
-        if (Array.isArray(filters.moodBoostGenres) && filters.moodBoostGenres.length > 0) {
+        // -----------------------------
+        // 6. Cálculo de AFINIDADE
+        // -----------------------------
 
-            // Função auxiliar para converter a string CSV-like em array e calcular a pontuação
-            const getScore = (movie) => {
-                let movieGenres = [];
+        const WEIGHTS = {
+            preferred: 50,
+            mood: 25,
+            language: 15,
+            rating: 10
+        };
 
-                // 💡 CORREÇÃO CRÍTICA: Converte a string delimitada por vírgula em um array, 
-                // removendo espaços em branco extras.
-                if (typeof movie.genre === 'string' && movie.genre.length > 0) {
-                    movieGenres = movie.genre.split(',').map(g => g.trim());
-                }
+        const computeAffinity = (movie) => {
+            const movieGenres = extractGenres(movie);
+            let score = 0;
 
-                // Garante que o array de gêneros está pronto para o cálculo
-                return filters.moodBoostGenres.filter(g => movieGenres.includes(g)).length;
+            // Preferred genres
+            if (filters.preferredGenres.length > 0) {
+                const matches = movieGenres.filter(g => filters.preferredGenres.includes(g)).length;
+                const total = filters.preferredGenres.length;
+                score += (matches / total) * WEIGHTS.preferred;
             }
 
-            results.sort((a, b) => {
-                const scoreA = getScore(a);
-                const scoreB = getScore(b);
+            // Mood boost
+            if (filters.moodBoostGenres.length > 0) {
+                const matches = movieGenres.filter(g => filters.moodBoostGenres.includes(g)).length;
+                const total = filters.moodBoostGenres.length;
+                score += (matches / total) * WEIGHTS.mood;
+            }
 
-                return scoreB - scoreA;
-            });
-        }
+            // Language
+            if (filters.languages.length > 0) {
+                if (filters.languages.includes(movie.originalLanguage)) {
+                    score += WEIGHTS.language;
+                }
+            }
+
+            // Rating
+            if (movie.voteAverage >= filters.minRating) {
+                score += WEIGHTS.rating;
+            }
+
+            return Math.round(score);
+        };
+
+        // Aplicar afinidade
+        results = results.map(movie => ({
+            ...movie,
+            affinity: computeAffinity(movie)
+        }));
+
+        // Ordenar por afinidade desc
+        results.sort((a, b) => b.affinity - a.affinity);
 
         return results;
-    }
+    };
 
-    return { findMoviesByFilters }
-}
+    return { findMoviesByFilters };
+};
